@@ -1,0 +1,28 @@
+name: MeshPay-Zero CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run Formal Verification & Benchmarks
+        run: |
+          python test_meshpay.py
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build TypeScript Audio Worklet
+        run: |
+          npm install --no-package-lock
+          npx tsc src/audio_worklet.ts --declaration --outDir dist
