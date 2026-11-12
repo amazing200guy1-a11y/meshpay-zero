@@ -37,6 +37,28 @@ class AcousticPacketEncoder:
     def __init__(self, secret_seed: str = "AEROSPACE_TITANIUM_KEY_2026"):
         self.secret_seed = secret_seed.encode('utf-8')
 
+    @staticmethod
+    def goertzel_spectral_power(samples: List[float], target_freq: float, sample_rate: int = AUDIO_SAMPLE_RATE) -> float:
+        """
+        Genuine Goertzel Discrete Fourier Transform algorithm.
+        Computes exact spectral power at target ultrasonic frequency bin.
+        s[n] = x[n] + 2*cos(omega)*s[n-1] - s[n-2]
+        """
+        if not samples or sample_rate <= 0:
+            return 0.0
+        n = len(samples)
+        k = int(0.5 + (n * target_freq) / sample_rate)
+        omega = (2.0 * math.pi * k) / n
+        coeff = 2.0 * math.cos(omega)
+        s_prev = 0.0
+        s_prev2 = 0.0
+        for x in samples:
+            s0 = x + coeff * s_prev - s_prev2
+            s_prev2 = s_prev
+            s_prev = s0
+        power = s_prev * s_prev + s_prev2 * s_prev2 - coeff * s_prev * s_prev2
+        return max(0.0, power)
+
     def sign_transaction(self, sender: str, recipient: str, amount_sats: int, nonce: int) -> Dict[str, Any]:
         """Constructs a deterministic tamper-proof transaction payload."""
         timestamp = int(time.time())
@@ -86,6 +108,28 @@ class AcousticPacketDecoder:
 
     def __init__(self, secret_seed: str = "AEROSPACE_TITANIUM_KEY_2026"):
         self.secret_seed = secret_seed.encode('utf-8')
+
+    @staticmethod
+    def goertzel_spectral_power(samples: List[float], target_freq: float, sample_rate: int = AUDIO_SAMPLE_RATE) -> float:
+        """
+        Genuine Goertzel Discrete Fourier Transform algorithm.
+        Computes exact spectral power at target ultrasonic frequency bin.
+        s[n] = x[n] + 2*cos(omega)*s[n-1] - s[n-2]
+        """
+        if not samples or sample_rate <= 0:
+            return 0.0
+        n = len(samples)
+        k = int(0.5 + (n * target_freq) / sample_rate)
+        omega = (2.0 * math.pi * k) / n
+        coeff = 2.0 * math.cos(omega)
+        s_prev = 0.0
+        s_prev2 = 0.0
+        for x in samples:
+            s0 = x + coeff * s_prev - s_prev2
+            s_prev2 = s_prev
+            s_prev = s0
+        power = s_prev * s_prev + s_prev2 * s_prev2 - coeff * s_prev * s_prev2
+        return max(0.0, power)
 
     def decode_frequencies(self, freq_sequence: List[Tuple[float, int]]) -> Optional[str]:
         """Demodulates detected audio frequencies into a raw bitstream."""
