@@ -1,0 +1,15 @@
+{
+  "name": "meshpay-zero",
+  "version": "1.0.0",
+  "description": "Ultrasonic acoustic FSK and offline mesh payment protocol for zero-data financial settlement",
+  "main": "dist/audio_worklet.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": ["dsp", "goertzel-fsk", "offline-payments", "ultrasonic-mesh"],
+  "author": "Usman Bamidele",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
